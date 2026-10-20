@@ -1,124 +1,287 @@
-<!doctype html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-		/>
-		<title>Ultraviolet | Sophisticated Web Proxy</title>
-		<meta
-			name="description"
-			content="Ultraviolet is a highly sophisticated proxy used for evading internet censorship or accessing websites in a controlled sandbox using the power of service-workers. Unblock sites today!"
-		/>
-		<meta
-			name="keywords"
-			content="proxy, web proxy, ultraviolet, service workers, unblock websites, unblock chromebook, free web proxy, proxy list, proxy sites, un block chromebook, online proxy, proxy server, proxysite, proxy youtube, bypass securly, bypass iboss, bypass lightspeed filter, holy unblocker, chromebooks, titanium network, unblock youtube, youtube proxy, unblocked youtube, youtube unblocked"
-		/>
-		<meta
-			name="theme-color"
-			media="(prefers-color-scheme: dark)"
-			content="#434c5e"
-		/>
-		<meta name="googlebot" content="index, follow, snippet" />
-		<link rel="shortcut icon" content="favicon.ico" />
-		<link rel="stylesheet" href="index.css" />
-		
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mini Browser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bar: #e9eef5;
+    --field: #ffffff;
+    --text: #1d2733;
+    --muted: #5d6b7c;
+    --line: #c9d3df;
+    --accent: #2f6fdb;
+    --hover: #d8e1ec;
+    --note: #fff6d9;
+    --note-text: #5c4a12;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bar: #1f2630;
+      --field: #2a333f;
+      --text: #e6ecf3;
+      --muted: #9aa8b8;
+      --line: #3a4552;
+      --accent: #6ea2ff;
+      --hover: #323d4b;
+      --note: #3a3220;
+      --note-text: #f1dfa6;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bar);
+    color: var(--text);
+    font-family: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  body { display: flex; flex-direction: column; }
 
-		<script src="baremux/index.js"></script>
-		<script src="uv/uv.bundle.js"></script>
-		<script src="uv/uv.config.js"></script>
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    background: var(--bar);
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  .nav-btn {
+    width: 36px; height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text);
+    display: grid; place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .nav-btn:hover:not(:disabled) { background: var(--hover); }
+  .nav-btn:disabled { color: var(--muted); opacity: .45; cursor: default; }
+  .nav-btn:focus-visible, #address:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .nav-btn svg { width: 18px; height: 18px; }
 
-		<script type="application/ld+json">
-			{
-				"@context": "https://schema.org",
-				"@type": "FAQPage",
-				"mainEntity": [
-					{
-						"@type": "Question",
-						"name": "What is Ultraviolet (Web Proxy)?",
-						"acceptedAnswer": {
-							"@type": "Answer",
-							"text": "Highly sophisticated proxy used for evading internet censorship or accessing websites in a controlled sandbox using the power of service-workers and more!"
-						}
-					},
-					{
-						"@type": "Question",
-						"name": "How do I unblock sites using Ultraviolet?",
-						"acceptedAnswer": {
-							"@type": "Answer",
-							"text": "Simply head to an official site featuring Ultraviolet such as Holy Unblocker or Incognito! You can also self-host Ultraviolet on your own web server for maximum privacy."
-						}
-					},
-					{
-						"@type": "Question",
-						"name": "What if Ultraviolet is blocked or not working?",
-						"acceptedAnswer": {
-							"@type": "Answer",
-							"text": "Join the Titanium Network Discord at discord.gg/unblock!"
-						}
-					}
-				]
-			}
-		</script>
-	</head>
+  form { flex: 1; display: flex; min-width: 0; }
+  #address {
+    flex: 1;
+    min-width: 0;
+    height: 36px;
+    padding: 0 16px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--field);
+    color: var(--text);
+    font: inherit;
+    font-size: 15px;
+  }
+  #address:focus { border-color: var(--accent); outline: none; }
 
-	<body>
-		<div
-			title="Ultraviolet Logo"
-			class="flex-center logo-wrapper header-center"
-		>
-			<img class="logo" src="uv.png" alt="Ultraviolet" />
-			<h1>Ultraviolet | TN</h1>
-		</div>
-		<div class="flex-center desc left-margin">
-			<p>
-				Ultraviolet is highly sophisticated proxy used for evading internet
-				censorship.
-			</p>
-		</div>
+  .progress {
+    position: absolute;
+    left: 0; bottom: -1px;
+    height: 2px;
+    width: 0;
+    background: var(--accent);
+    transition: width .4s ease, opacity .3s ease;
+    opacity: 0;
+  }
+  .progress.loading { width: 70%; opacity: 1; transition: width 4s ease-out; }
+  .progress.done { width: 100%; opacity: 0; }
 
-		<form id="uv-form" class="flex-center">
-			<input
-				id="uv-search-engine"
-				value="https://www.google.com/search?q=%s"
-				type="hidden"
-			/>
-			<input id="uv-address" type="text" placeholder="Search the web freely" />
-		</form>
-		<div class="desc left-margin">
-			<p id="uv-error"></p>
-			<pre id="uv-error-code"></pre>
-		</div>
-		<footer>
-			<div>
-				<a
-					title="The TitaniumNetwork GitHub organization"
-					href="https://github.com/titaniumnetwork-dev"
-					>TitaniumNetwork</a
-				>
-				<a title="The TitaniumNetwork Discord" href="https://discord.gg/unblock"
-					>Discord</a
-				>
-				<a
-					title="The TompHTTP GitHub organization"
-					href="https://github.com/tomphttp"
-					>TompHTTP</a
-				>
-				<a
-					title="The official deployment repository for Ultraviolet"
-					href="https://github.com/titaniumnetwork-dev/Ultraviolet-App"
-					>GitHub</a
-				>
-				<a title="License information" href="credits.html">Credits</a>
-			</div>
-			<div>
-				<span>Ultraviolet &copy; TN 2023</span>
-			</div>
-		</footer>
-		<iframe style="display: none" id="uv-frame"></iframe>
-		<script src="register-sw.js"></script>
-		<script src="search.js"></script>
-		<script src="index.js"></script>
-	</body>
+  .note {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    font-size: 13px;
+    background: var(--note);
+    color: var(--note-text);
+  }
+  .note button {
+    margin-left: auto;
+    border: none; background: transparent;
+    color: inherit; font: inherit; cursor: pointer;
+    text-decoration: underline;
+  }
+  .note[hidden] { display: none; }
+
+  iframe {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: #fff;
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button class="nav-btn" id="back" title="Back (Alt+←)" aria-label="Back" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button class="nav-btn" id="forward" title="Forward (Alt+→)" aria-label="Forward" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+  <button class="nav-btn" id="reload" title="Reload" aria-label="Reload">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+  </button>
+  <button class="nav-btn" id="home" title="Home" aria-label="Home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+  </button>
+
+  <form id="nav-form" autocomplete="off">
+    <input id="address" type="text" placeholder="Search or type a web address" spellcheck="false" aria-label="Address bar">
+  </form>
+
+  <button class="nav-btn" id="newtab" title="Open this page in a new tab" aria-label="Open in new tab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+  </button>
+
+  <div class="progress" id="progress"></div>
+</div>
+
+<div class="note" id="note" hidden>
+  <span id="note-text"></span>
+  <button id="dismiss">Dismiss</button>
+</div>
+
+<iframe id="view" title="Page view"></iframe>
+
+<!--
+  Ultraviolet files that come with the Ultraviolet-App repo.
+  If the repo's own public/index.html lists different paths, use those instead.
+-->
+<script src="baremux/index.js"></script>
+<script src="epoxy/index.js"></script>
+<script src="uv/uv.bundle.js"></script>
+<script src="uv/uv.config.js"></script>
+<script src="register-sw.js"></script>
+
+<script>
+  const HOME = "https://duckduckgo.com";
+  const SEARCH = "https://duckduckgo.com/?q=";
+
+  const frame = document.getElementById("view");
+  const address = document.getElementById("address");
+  const backBtn = document.getElementById("back");
+  const fwdBtn = document.getElementById("forward");
+  const progress = document.getElementById("progress");
+  const note = document.getElementById("note");
+  const noteText = document.getElementById("note-text");
+
+  let history = [];
+  let index = -1;
+  let ourNavigation = false;   // true while a load was started by the toolbar
+
+  function showNote(msg) { noteText.textContent = msg; note.hidden = false; }
+
+  // Start the proxy: service worker + connection to the server.
+  const ready = (async () => {
+    await registerSW();
+    const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+    const wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
+    if (await connection.getTransport() !== "/epoxy/index.mjs") {
+      await connection.setTransport("/epoxy/index.mjs", [{ wisp: wispUrl }]);
+    }
+  })().catch(err => {
+    showNote("The proxy failed to start: " + err.message + ". Reload the page to try again.");
+    throw err;
+  });
+
+  // Real URL -> proxied URL on your own server, and back again.
+  const toProxy = url => __uv$config.prefix + __uv$config.encodeUrl(url);
+  function fromProxy(href) {
+    const path = new URL(href).pathname + new URL(href).search + new URL(href).hash;
+    if (!path.startsWith(__uv$config.prefix)) return null;
+    return __uv$config.decodeUrl(path.slice(__uv$config.prefix.length));
+  }
+
+  function toUrl(input) {
+    const text = input.trim();
+    if (!text) return null;
+    if (/^https?:\/\//i.test(text)) return text;
+    if (!/\s/.test(text) && /\.[a-z]{2,}(:\d+)?(\/|$|\?|#)/i.test(text)) return "https://" + text;
+    return SEARCH + encodeURIComponent(text);
+  }
+
+  async function load(url) {
+    address.value = url;
+    updateButtons();
+    progress.className = "progress";
+    void progress.offsetWidth;
+    progress.className = "progress loading";
+    await ready;
+    ourNavigation = true;
+    frame.src = toProxy(url);
+  }
+
+  function navigate(input) {
+    const url = toUrl(input);
+    if (!url) return;
+    history = history.slice(0, index + 1);
+    history.push(url);
+    index = history.length - 1;
+    load(url);
+  }
+
+  function goBack()    { if (index > 0) { index--; load(history[index]); } }
+  function goForward() { if (index < history.length - 1) { index++; load(history[index]); } }
+
+  function updateButtons() {
+    backBtn.disabled = index <= 0;
+    fwdBtn.disabled = index >= history.length - 1;
+  }
+
+  // Pages now come from your own server, so the real URL can be read,
+  // including after clicking links inside the page.
+  frame.addEventListener("load", () => {
+    progress.className = "progress done";
+    let real = null;
+    try { real = fromProxy(frame.contentWindow.location.href); } catch (e) {}
+    if (!real) { ourNavigation = false; return; }
+
+    if (ourNavigation) {
+      history[index] = real;          // keep redirects (chess.com -> www.chess.com) in one entry
+    } else if (real !== history[index]) {
+      history = history.slice(0, index + 1);   // a link was clicked inside the page
+      history.push(real);
+      index = history.length - 1;
+    }
+    ourNavigation = false;
+    address.value = real;
+    updateButtons();
+  });
+
+  document.getElementById("nav-form").addEventListener("submit", e => {
+    e.preventDefault();
+    navigate(address.value);
+    address.blur();
+  });
+  backBtn.addEventListener("click", goBack);
+  fwdBtn.addEventListener("click", goForward);
+  document.getElementById("reload").addEventListener("click", () => {
+    if (index >= 0) load(history[index]);
+  });
+  document.getElementById("home").addEventListener("click", () => navigate(HOME));
+  document.getElementById("newtab").addEventListener("click", () => {
+    if (index >= 0) window.open(history[index], "_blank", "noopener");
+  });
+  document.getElementById("dismiss").addEventListener("click", () => { note.hidden = true; });
+  address.addEventListener("focus", () => address.select());
+
+  document.addEventListener("keydown", e => {
+    if (e.altKey && e.key === "ArrowLeft") { e.preventDefault(); goBack(); }
+    if (e.altKey && e.key === "ArrowRight") { e.preventDefault(); goForward(); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "l") { e.preventDefault(); address.focus(); }
+  });
+
+  navigate(HOME);
+</script>
+</body>
 </html>
